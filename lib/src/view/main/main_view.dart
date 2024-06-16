@@ -1,5 +1,5 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_fl_chart_fundamentals/src/service/theme_service.dart';
 import 'package:flutter_fl_chart_fundamentals/src/view/base_view.dart';
 import 'package:flutter_fl_chart_fundamentals/src/view/main/main_view_model.dart';
 
@@ -11,11 +11,8 @@ class MainView extends StatelessWidget {
     return BaseView(
       viewModelProvider: mainViewModelProvider,
       builder: (ref, viewModel, state) => Center(
-        child: Text(
-          'Empty',
-          style: ref.textTheme.titleLarge?.copyWith(
-            color: ref.theme.colorScheme.onSurface,
-          ),
+        child: BarChart(
+          BarChartData(),
         ),
       ),
     );
