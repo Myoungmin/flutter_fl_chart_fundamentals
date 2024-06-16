@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_initial_template/src/view/main/main_view.dart';
-import 'package:flutter_initial_template/theme/component/constrained_screen.dart';
+import 'package:flutter_fl_chart_fundamentals/src/view/main/main_view.dart';
+import 'package:flutter_fl_chart_fundamentals/theme/component/constrained_screen.dart';
 
 abstract class RoutePath {
   static const String main = 'main';

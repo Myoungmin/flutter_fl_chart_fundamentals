@@ -1,4 +1,4 @@
-import 'package:flutter_initial_template/src/view/base_view_model.dart';
+import 'package:flutter_fl_chart_fundamentals/src/view/base_view_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final mainViewModelProvider =

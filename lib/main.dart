@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_initial_template/src/service/lang_service.dart';
-import 'package:flutter_initial_template/src/service/theme_service.dart';
-import 'package:flutter_initial_template/util/lang/generated/l10n.dart';
-import 'package:flutter_initial_template/util/route_path.dart';
+import 'package:flutter_fl_chart_fundamentals/src/service/lang_service.dart';
+import 'package:flutter_fl_chart_fundamentals/src/service/theme_service.dart';
+import 'package:flutter_fl_chart_fundamentals/util/lang/generated/l10n.dart';
+import 'package:flutter_fl_chart_fundamentals/util/route_path.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

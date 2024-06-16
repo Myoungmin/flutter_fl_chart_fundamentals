@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_initial_template/src/service/theme_service.dart';
-import 'package:flutter_initial_template/src/view/base_view.dart';
-import 'package:flutter_initial_template/src/view/main/main_view_model.dart';
-import 'package:flutter_initial_template/theme/component/base_dialog.dart';
-import 'package:flutter_initial_template/theme/res/layout.dart';
-import 'package:flutter_initial_template/util/lang/generated/l10n.dart';
+import 'package:flutter_fl_chart_fundamentals/src/service/theme_service.dart';
+import 'package:flutter_fl_chart_fundamentals/src/view/base_view.dart';
+import 'package:flutter_fl_chart_fundamentals/src/view/main/main_view_model.dart';
+import 'package:flutter_fl_chart_fundamentals/theme/component/base_dialog.dart';
+import 'package:flutter_fl_chart_fundamentals/theme/res/layout.dart';
+import 'package:flutter_fl_chart_fundamentals/util/lang/generated/l10n.dart';
 
 class MainView extends StatelessWidget {
   const MainView({super.key});

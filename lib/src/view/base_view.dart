@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_initial_template/src/view/base_view_model.dart';
-import 'package:flutter_initial_template/theme/component/circular_indicator.dart';
+import 'package:flutter_fl_chart_fundamentals/src/view/base_view_model.dart';
+import 'package:flutter_fl_chart_fundamentals/theme/component/circular_indicator.dart';
 
 class BaseView<VM extends BaseViewModel<S>, S extends BaseViewState>
     extends ConsumerWidget {

@@ -1,5 +1,7 @@
-# flutter_initial_template
+# flutter_fl_chart_fundamentals
+
 ## 향후 확장성을 위한 템플릿 프로젝트 구성
+
 - MultiProvider로 Service 구현
   - 다국어
   - Theme

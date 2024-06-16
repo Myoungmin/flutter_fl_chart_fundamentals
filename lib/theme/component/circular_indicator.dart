@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_initial_template/src/service/theme_service.dart';
+import 'package:flutter_fl_chart_fundamentals/src/service/theme_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class CircularIndicator extends ConsumerWidget {

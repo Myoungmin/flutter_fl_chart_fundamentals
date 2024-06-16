@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "flutter_initial_template" "\0"
+            VALUE "FileDescription", "flutter_fl_chart_fundamentals" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "flutter_initial_template" "\0"
+            VALUE "InternalName", "flutter_fl_chart_fundamentals" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2024 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "flutter_initial_template.exe" "\0"
-            VALUE "ProductName", "flutter_initial_template" "\0"
+            VALUE "OriginalFilename", "flutter_fl_chart_fundamentals.exe" "\0"
+            VALUE "ProductName", "flutter_fl_chart_fundamentals" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

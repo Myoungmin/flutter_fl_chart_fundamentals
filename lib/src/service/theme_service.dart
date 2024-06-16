@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_initial_template/theme/foundation/app_theme.dart';
+import 'package:flutter_fl_chart_fundamentals/theme/foundation/app_theme.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final themeServiceProvider =
