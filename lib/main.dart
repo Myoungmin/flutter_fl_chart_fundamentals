@@ -44,35 +44,56 @@ class BarChartPage extends ConsumerWidget {
               sideTitles: SideTitles(
                 showTitles: true,
                 reservedSize: 22,
-                interval: 32,
+                interval: 10,
                 getTitlesWidget: (double value, TitleMeta meta) {
                   const style = TextStyle(
                     color: Color(0xff7589a2),
                     fontWeight: FontWeight.bold,
                     fontSize: 10,
                   );
+
+                  String text;
+                  if (value.toInt() % 10 != 0) {
+                    text = '';
+                  } else {
+                    text = value.toInt().toString();
+                  }
+
                   return SideTitleWidget(
                     axisSide: meta.axisSide,
                     space: 4,
-                    child: Text(value.toInt().toString(), style: style),
+                    child: Text(text, style: style),
                   );
                 },
               ),
             ),
             leftTitles: AxisTitles(
               sideTitles: SideTitles(
+                reservedSize: 40,
                 showTitles: true,
-                interval: 1000000,
+                interval: 1000,
                 getTitlesWidget: (double value, TitleMeta meta) {
                   const style = TextStyle(
-                    color: Color(0xff7589a2),
+                    color: Colors.black,
                     fontWeight: FontWeight.bold,
                     fontSize: 10,
                   );
+
+                  String text;
+                  if (value.toInt() % 1000 != 0) {
+                    text = '';
+                  } else if (value >= 1000000) {
+                    text = '${(value / 1000000).toStringAsFixed(0)}M';
+                  } else if (value >= 1000) {
+                    text = '${(value / 1000).toStringAsFixed(0)}K';
+                  } else {
+                    text = value.toInt().toString();
+                  }
+
                   return SideTitleWidget(
                     axisSide: meta.axisSide,
                     space: 4,
-                    child: Text(value.toInt().toString(), style: style),
+                    child: Text(text, style: style),
                   );
                 },
               ),
@@ -81,14 +102,11 @@ class BarChartPage extends ConsumerWidget {
           borderData: FlBorderData(
             show: true,
             border: const Border(
-              bottom: BorderSide(color: Colors.black, width: 1),
-              left: BorderSide(color: Colors.black, width: 1),
-              right: BorderSide(color: Colors.transparent),
               top: BorderSide(color: Colors.transparent),
             ),
           ),
           gridData: const FlGridData(show: true),
-          barTouchData: BarTouchData(enabled: false),
+          barTouchData: BarTouchData(enabled: true),
         ),
       ),
     );
