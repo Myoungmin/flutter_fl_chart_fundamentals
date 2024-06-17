@@ -1,21 +1,16 @@
 name: flutter_fl_chart_fundamentals
 description: "A new Flutter project."
-publish_to: "none"
+publish_to: 'none'
 version: 0.1.0
 
 environment:
-  sdk: ">=3.2.3 <4.0.0"
+  sdk: '>=3.2.3 <4.0.0'
 
 dependencies:
   fl_chart: ^0.68.0
   flutter:
     sdk: flutter
-  flutter_localizations:
-    sdk: flutter
-  flutter_riverpod: ^2.4.10
-  grpc: ^3.2.4
-  intl: ^0.18.1
-  protobuf: ^3.1.0
+  flutter_riverpod: ^2.5.1
 
 dev_dependencies:
   flutter_test:
@@ -24,7 +19,3 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-flutter_intl:
-  enabled: true
-  arb_dir: lib/util/lang/l10n
-  output_dir: lib/util/lang/generated
