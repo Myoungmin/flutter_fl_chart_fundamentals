@@ -1,21 +1,25 @@
 name: flutter_fl_chart_fundamentals
 description: "A new Flutter project."
-publish_to: 'none'
+publish_to: "none"
 version: 0.1.0
 
 environment:
-  sdk: '>=3.2.3 <4.0.0'
+  sdk: ">=3.2.3 <4.0.0"
 
 dependencies:
   fl_chart: ^0.68.0
   flutter:
     sdk: flutter
   flutter_riverpod: ^2.5.1
+  freezed_annotation:
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.0
+  build_runner:
+  freezed:
+  json_serializable:
 
 flutter:
   uses-material-design: true

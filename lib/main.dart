@@ -3,27 +3,28 @@ import 'dart:typed_data';
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_fl_chart_fundamentals/image_data.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final imageInfoProvider =
-    NotifierProvider<ImageInfoNotifier, ImageInfo>(ImageInfoNotifier.new);
+final imageDataProvider =
+    NotifierProvider<ImageDataNotifier, ImageData>(ImageDataNotifier.new);
 
-class ImageInfoNotifier extends Notifier<ImageInfo> {
+class ImageDataNotifier extends Notifier<ImageData> {
   @override
-  ImageInfo build() {
+  ImageData build() {
     Random random = Random();
     Uint16List imageData = Uint16List.fromList(
       List<int>.generate(3082 * 3082, (index) => random.nextInt(65536)),
     );
 
-    return ImageInfo(
+    return ImageData(
       width: 3082,
       height: 3082,
       image: imageData,
     );
   }
 
-  void setImageInfo(ImageInfo info) {
+  void setImageData(ImageData info) {
     state = info;
   }
 }
@@ -33,12 +34,12 @@ class BarChartPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ImageInfo imageInfo = ref.watch(imageInfoProvider);
+    ImageData imageData = ref.watch(imageDataProvider);
 
     return Center(
       child: BarChart(
         BarChartData(
-          barGroups: _generateBarGroups(imageInfo),
+          barGroups: _generateBarGroups(imageData),
           titlesData: FlTitlesData(
             bottomTitles: AxisTitles(
               sideTitles: SideTitles(
@@ -112,13 +113,11 @@ class BarChartPage extends ConsumerWidget {
     );
   }
 
-  List<BarChartGroupData> _generateBarGroups(ImageInfo info) {
+  List<BarChartGroupData> _generateBarGroups(ImageData data) {
     List<int> histogram = List.filled(65536, 0);
 
-    if (info.image != null) {
-      for (var value in info.image!) {
-        histogram[value]++;
-      }
+    for (var value in data.image!) {
+      histogram[value]++;
     }
 
     List<int> groupedHistogram = List.filled(256, 0);
@@ -146,29 +145,17 @@ class BarChartPage extends ConsumerWidget {
   }
 }
 
-ImageInfo generateFakeImageInfo(int width, int height) {
+ImageData generateFakeImageData(int width, int height) {
   Random random = Random();
   Uint16List imageData = Uint16List.fromList(
     List<int>.generate(width * height, (index) => random.nextInt(65536)),
   );
 
-  return ImageInfo(
+  return ImageData(
     width: width,
     height: height,
     image: imageData,
   );
-}
-
-class ImageInfo {
-  int width;
-  int height;
-  Uint16List? image;
-
-  ImageInfo({
-    this.width = 0,
-    this.height = 0,
-    this.image,
-  });
 }
 
 void main() {
