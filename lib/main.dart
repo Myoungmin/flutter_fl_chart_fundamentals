@@ -78,7 +78,7 @@ class BarChartPage extends ConsumerWidget {
               sideTitles: SideTitles(
                 showTitles: true,
                 reservedSize: 22,
-                interval: 10,
+                interval: 1000,
                 getTitlesWidget: (double value, TitleMeta meta) {
                   const style = TextStyle(
                     color: Color(0xff7589a2),
@@ -131,6 +131,21 @@ class BarChartPage extends ConsumerWidget {
                   );
                 },
               ),
+            ),
+            topTitles: AxisTitles(
+              sideTitles: SideTitles(
+                  showTitles: true,
+                  reservedSize: 50,
+                  getTitlesWidget: (double value, TitleMeta meta) {
+                    return const SizedBox.shrink();
+                  }),
+            ),
+            rightTitles: AxisTitles(
+              sideTitles: SideTitles(
+                  showTitles: true,
+                  getTitlesWidget: (double value, TitleMeta meta) {
+                    return const SizedBox.shrink();
+                  }),
             ),
           ),
           borderData: FlBorderData(
