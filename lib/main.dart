@@ -138,7 +138,7 @@ class BarChartPage extends ConsumerWidget {
             topTitles: AxisTitles(
               sideTitles: SideTitles(
                   showTitles: true,
-                  reservedSize: 50,
+                  reservedSize: 88,
                   getTitlesWidget: (double value, TitleMeta meta) {
                     return const SizedBox.shrink();
                   }),
@@ -158,7 +158,17 @@ class BarChartPage extends ConsumerWidget {
             ),
           ),
           gridData: const FlGridData(show: true),
-          barTouchData: BarTouchData(enabled: true),
+          barTouchData: BarTouchData(
+            enabled: true,
+            touchTooltipData: BarTouchTooltipData(
+              getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                return BarTooltipItem(
+                  'Count: ${rod.toY.toStringAsFixed(0)}\n Pixel Value: ${group.x * 256}\n',
+                  const TextStyle(color: Colors.red),
+                );
+              },
+            ),
+          ),
         ),
       ),
     );
