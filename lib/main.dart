@@ -70,120 +70,136 @@ class BarChartPage extends ConsumerWidget {
     ImageData imageData = ref.watch(imageDataProvider);
 
     return Center(
-      child: BarChart(
-        BarChartData(
-          barGroups: _generateBarGroups(imageData),
-          titlesData: FlTitlesData(
-            bottomTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                reservedSize: 22,
-                interval: 2048,
-                getTitlesWidget: (double value, TitleMeta meta) {
-                  const style = TextStyle(
-                    color: Color(0xff7589a2),
-                    fontWeight: FontWeight.bold,
-                    fontSize: 10,
-                  );
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          double availableWidth = constraints.maxWidth;
 
-                  String text;
-                  int groupValue = value.toInt() * 256;
-                  if (groupValue % 2048 != 0) {
-                    text = '';
-                  } else if (groupValue >= 1000) {
-                    text = '${(groupValue / 1000).toStringAsFixed(0)}K';
-                  } else {
-                    text = groupValue.toString();
-                  }
+          return SizedBox(
+            width: availableWidth,
+            height: constraints.maxHeight,
+            child: BarChart(
+              BarChartData(
+                barGroups: _generateBarGroups(imageData, availableWidth),
+                titlesData: FlTitlesData(
+                  bottomTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      reservedSize: 22,
+                      interval: 2048,
+                      getTitlesWidget: (double value, TitleMeta meta) {
+                        const style = TextStyle(
+                          color: Color(0xff7589a2),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 10,
+                        );
 
-                  return SideTitleWidget(
-                    axisSide: meta.axisSide,
-                    space: 4,
-                    child: Text(text, style: style),
-                  );
-                },
+                        String text;
+                        int groupValue = value.toInt() * 256;
+                        if (groupValue % 2048 != 0) {
+                          text = '';
+                        } else if (groupValue >= 1000) {
+                          text = '${(groupValue / 1000).toStringAsFixed(0)}K';
+                        } else {
+                          text = groupValue.toString();
+                        }
+
+                        return SideTitleWidget(
+                          axisSide: meta.axisSide,
+                          space: 4,
+                          child: Text(text, style: style),
+                        );
+                      },
+                    ),
+                  ),
+                  leftTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      reservedSize: 40,
+                      showTitles: true,
+                      interval: 1000,
+                      getTitlesWidget: (double value, TitleMeta meta) {
+                        const style = TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 10,
+                        );
+
+                        String text;
+                        if (value.toInt() % 1000 != 0) {
+                          text = '';
+                        } else if (value >= 1000000) {
+                          text = '${(value / 1000000).toStringAsFixed(0)}M';
+                        } else if (value >= 1000) {
+                          text = '${(value / 1000).toStringAsFixed(0)}K';
+                        } else {
+                          text = value.toInt().toString();
+                        }
+
+                        return SideTitleWidget(
+                          axisSide: meta.axisSide,
+                          space: 4,
+                          child: Text(text, style: style),
+                        );
+                      },
+                    ),
+                  ),
+                  topTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                        showTitles: true,
+                        reservedSize: 88,
+                        getTitlesWidget: (double value, TitleMeta meta) {
+                          return const SizedBox.shrink();
+                        }),
+                  ),
+                  rightTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                        showTitles: true,
+                        getTitlesWidget: (double value, TitleMeta meta) {
+                          return const SizedBox.shrink();
+                        }),
+                  ),
+                ),
+                borderData: FlBorderData(
+                  show: true,
+                  border: const Border(
+                    top: BorderSide(color: Colors.transparent),
+                  ),
+                ),
+                gridData: const FlGridData(show: true),
+                barTouchData: BarTouchData(
+                  enabled: true,
+                  touchTooltipData: BarTouchTooltipData(
+                    getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                      return BarTooltipItem(
+                        'Count: ${rod.toY.toStringAsFixed(0)}\n Pixel Value: ${group.x * 256}\n',
+                        const TextStyle(color: Colors.red),
+                      );
+                    },
+                  ),
+                ),
               ),
             ),
-            leftTitles: AxisTitles(
-              sideTitles: SideTitles(
-                reservedSize: 40,
-                showTitles: true,
-                interval: 1000,
-                getTitlesWidget: (double value, TitleMeta meta) {
-                  const style = TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 10,
-                  );
-
-                  String text;
-                  if (value.toInt() % 1000 != 0) {
-                    text = '';
-                  } else if (value >= 1000000) {
-                    text = '${(value / 1000000).toStringAsFixed(0)}M';
-                  } else if (value >= 1000) {
-                    text = '${(value / 1000).toStringAsFixed(0)}K';
-                  } else {
-                    text = value.toInt().toString();
-                  }
-
-                  return SideTitleWidget(
-                    axisSide: meta.axisSide,
-                    space: 4,
-                    child: Text(text, style: style),
-                  );
-                },
-              ),
-            ),
-            topTitles: AxisTitles(
-              sideTitles: SideTitles(
-                  showTitles: true,
-                  reservedSize: 88,
-                  getTitlesWidget: (double value, TitleMeta meta) {
-                    return const SizedBox.shrink();
-                  }),
-            ),
-            rightTitles: AxisTitles(
-              sideTitles: SideTitles(
-                  showTitles: true,
-                  getTitlesWidget: (double value, TitleMeta meta) {
-                    return const SizedBox.shrink();
-                  }),
-            ),
-          ),
-          borderData: FlBorderData(
-            show: true,
-            border: const Border(
-              top: BorderSide(color: Colors.transparent),
-            ),
-          ),
-          gridData: const FlGridData(show: true),
-          barTouchData: BarTouchData(
-            enabled: true,
-            touchTooltipData: BarTouchTooltipData(
-              getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                return BarTooltipItem(
-                  'Count: ${rod.toY.toStringAsFixed(0)}\n Pixel Value: ${group.x * 256}\n',
-                  const TextStyle(color: Colors.red),
-                );
-              },
-            ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }
 
-  List<BarChartGroupData> _generateBarGroups(ImageData data) {
+  List<BarChartGroupData> _generateBarGroups(
+      ImageData data, double availableWidth) {
     List<int> histogram = List.filled(65536, 0);
 
     for (var value in data.image!) {
       histogram[value]++;
     }
 
-    List<int> groupedHistogram = List.filled(256, 0);
+    int groupSize = 256;
+    double barWidth = availableWidth / groupSize;
+
+    List<int> groupedHistogram = List.filled(groupSize, 0);
     for (int i = 0; i < 65536; i++) {
-      groupedHistogram[i ~/ 256] += histogram[i];
+      if (i % groupSize == 0) {
+        groupedHistogram[i ~/ groupSize] = histogram[i];
+      }
     }
 
     List<BarChartGroupData> barGroups = [];
@@ -195,7 +211,7 @@ class BarChartPage extends ConsumerWidget {
             BarChartRodData(
               toY: groupedHistogram[i].toDouble(),
               color: Colors.blue,
-              width: 5,
+              width: barWidth,
             ),
           ],
         ),
