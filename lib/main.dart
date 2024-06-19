@@ -78,7 +78,7 @@ class BarChartPage extends ConsumerWidget {
               sideTitles: SideTitles(
                 showTitles: true,
                 reservedSize: 22,
-                interval: 1000,
+                interval: 2048,
                 getTitlesWidget: (double value, TitleMeta meta) {
                   const style = TextStyle(
                     color: Color(0xff7589a2),
@@ -87,10 +87,13 @@ class BarChartPage extends ConsumerWidget {
                   );
 
                   String text;
-                  if (value.toInt() % 10 != 0) {
+                  int groupValue = value.toInt() * 256;
+                  if (groupValue % 2048 != 0) {
                     text = '';
+                  } else if (groupValue >= 1000) {
+                    text = '${(groupValue / 1000).toStringAsFixed(0)}K';
                   } else {
-                    text = value.toInt().toString();
+                    text = groupValue.toString();
                   }
 
                   return SideTitleWidget(
