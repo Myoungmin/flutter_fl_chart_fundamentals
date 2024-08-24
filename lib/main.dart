@@ -64,6 +64,7 @@ class ImageDataNotifier extends Notifier<ImageData> {
 }
 
 final scaleFactorProvider = StateProvider<double>((ref) => 1.0);
+final offsetProvider = StateProvider<Offset>((ref) => Offset.zero);
 
 class BarChartPage extends ConsumerWidget {
   const BarChartPage({Key? key}) : super(key: key);
@@ -72,6 +73,7 @@ class BarChartPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     ImageData imageData = ref.watch(imageDataProvider);
     double scaleFactor = ref.watch(scaleFactorProvider);
+    Offset offset = ref.watch(offsetProvider);
 
     return Center(
       child: LayoutBuilder(
@@ -81,114 +83,131 @@ class BarChartPage extends ConsumerWidget {
           return Listener(
             onPointerSignal: (event) {
               if (event is PointerScrollEvent) {
-                double scaleFactor = event.scrollDelta.dy > 0 ? 0.9 : 1.1;
-                ref.read(scaleFactorProvider.notifier).update((state) {
-                  double newScale = state * scaleFactor;
-                  return newScale;
-                });
+                double scaleChange = event.scrollDelta.dy > 0 ? 0.9 : 1.1;
+                double currentScale = ref.read(scaleFactorProvider);
+
+                double scale = currentScale * scaleChange;
+
+                Offset focalPoint = event.localPosition;
+
+                Offset offsetBefore = ref.read(offsetProvider);
+
+                Offset focalPointInWidget =
+                    (focalPoint - offsetBefore) / currentScale;
+
+                ref.read(offsetProvider.notifier).state =
+                    focalPoint - focalPointInWidget * scale;
+
+                ref.read(scaleFactorProvider.notifier).state = scale;
               }
             },
-            child: SizedBox(
-              width: availableWidth,
-              height: constraints.maxHeight,
-              child: BarChart(
-                BarChartData(
-                  barGroups: _generateBarGroups(
-                      imageData, availableWidth, scaleFactor),
-                  titlesData: FlTitlesData(
-                    bottomTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        reservedSize: 22,
-                        interval: 2048,
-                        getTitlesWidget: (double value, TitleMeta meta) {
-                          const style = TextStyle(
-                            color: Color(0xff7589a2),
-                            fontWeight: FontWeight.bold,
-                            fontSize: 10,
-                          );
+            child: Transform(
+              transform: Matrix4.identity()
+                ..translate(offset.dx, offset.dy)
+                ..scale(scaleFactor, scaleFactor),
+              alignment: FractionalOffset.topLeft,
+              child: SizedBox(
+                width: availableWidth,
+                height: constraints.maxHeight,
+                child: BarChart(
+                  BarChartData(
+                    barGroups: _generateBarGroups(imageData, availableWidth),
+                    titlesData: FlTitlesData(
+                      bottomTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          reservedSize: 22,
+                          interval: 2048,
+                          getTitlesWidget: (double value, TitleMeta meta) {
+                            const style = TextStyle(
+                              color: Color(0xff7589a2),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 10,
+                            );
 
-                          String text;
-                          int groupValue = value.toInt() * 256;
-                          if (groupValue % 2048 != 0) {
-                            text = '';
-                          } else if (groupValue >= 1000) {
-                            text = '${(groupValue / 1000).toStringAsFixed(0)}K';
-                          } else {
-                            text = groupValue.toString();
-                          }
+                            String text;
+                            int groupValue = value.toInt() * 256;
+                            if (groupValue % 2048 != 0) {
+                              text = '';
+                            } else if (groupValue >= 1000) {
+                              text =
+                                  '${(groupValue / 1000).toStringAsFixed(0)}K';
+                            } else {
+                              text = groupValue.toString();
+                            }
 
-                          return SideTitleWidget(
-                            axisSide: meta.axisSide,
-                            space: 4,
-                            child: Text(text, style: style),
+                            return SideTitleWidget(
+                              axisSide: meta.axisSide,
+                              space: 4,
+                              child: Text(text, style: style),
+                            );
+                          },
+                        ),
+                      ),
+                      leftTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          reservedSize: 40,
+                          showTitles: true,
+                          interval: 1000,
+                          getTitlesWidget: (double value, TitleMeta meta) {
+                            const style = TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 10,
+                            );
+
+                            String text;
+                            if (value.toInt() % 1000 != 0) {
+                              text = '';
+                            } else if (value >= 1000000) {
+                              text = '${(value / 1000000).toStringAsFixed(0)}M';
+                            } else if (value >= 1000) {
+                              text = '${(value / 1000).toStringAsFixed(0)}K';
+                            } else {
+                              text = value.toInt().toString();
+                            }
+
+                            return SideTitleWidget(
+                              axisSide: meta.axisSide,
+                              space: 4,
+                              child: Text(text, style: style),
+                            );
+                          },
+                        ),
+                      ),
+                      topTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                            showTitles: true,
+                            reservedSize: 88,
+                            getTitlesWidget: (double value, TitleMeta meta) {
+                              return const SizedBox.shrink();
+                            }),
+                      ),
+                      rightTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                            showTitles: true,
+                            getTitlesWidget: (double value, TitleMeta meta) {
+                              return const SizedBox.shrink();
+                            }),
+                      ),
+                    ),
+                    borderData: FlBorderData(
+                      show: true,
+                      border: const Border(
+                        top: BorderSide(color: Colors.transparent),
+                      ),
+                    ),
+                    gridData: const FlGridData(show: true),
+                    barTouchData: BarTouchData(
+                      enabled: true,
+                      touchTooltipData: BarTouchTooltipData(
+                        getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                          return BarTooltipItem(
+                            'Count: ${rod.toY.toStringAsFixed(0)}\n Pixel Value: ${group.x * 256}\n',
+                            const TextStyle(color: Colors.red),
                           );
                         },
                       ),
-                    ),
-                    leftTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        reservedSize: 40,
-                        showTitles: true,
-                        interval: 1000,
-                        getTitlesWidget: (double value, TitleMeta meta) {
-                          const style = TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 10,
-                          );
-
-                          String text;
-                          if (value.toInt() % 1000 != 0) {
-                            text = '';
-                          } else if (value >= 1000000) {
-                            text = '${(value / 1000000).toStringAsFixed(0)}M';
-                          } else if (value >= 1000) {
-                            text = '${(value / 1000).toStringAsFixed(0)}K';
-                          } else {
-                            text = value.toInt().toString();
-                          }
-
-                          return SideTitleWidget(
-                            axisSide: meta.axisSide,
-                            space: 4,
-                            child: Text(text, style: style),
-                          );
-                        },
-                      ),
-                    ),
-                    topTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                          showTitles: true,
-                          reservedSize: 88,
-                          getTitlesWidget: (double value, TitleMeta meta) {
-                            return const SizedBox.shrink();
-                          }),
-                    ),
-                    rightTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                          showTitles: true,
-                          getTitlesWidget: (double value, TitleMeta meta) {
-                            return const SizedBox.shrink();
-                          }),
-                    ),
-                  ),
-                  borderData: FlBorderData(
-                    show: true,
-                    border: const Border(
-                      top: BorderSide(color: Colors.transparent),
-                    ),
-                  ),
-                  gridData: const FlGridData(show: true),
-                  barTouchData: BarTouchData(
-                    enabled: true,
-                    touchTooltipData: BarTouchTooltipData(
-                      getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                        return BarTooltipItem(
-                          'Count: ${rod.toY.toStringAsFixed(0)}\n Pixel Value: ${group.x * 256}\n',
-                          const TextStyle(color: Colors.red),
-                        );
-                      },
                     ),
                   ),
                 ),
@@ -201,7 +220,7 @@ class BarChartPage extends ConsumerWidget {
   }
 
   List<BarChartGroupData> _generateBarGroups(
-      ImageData data, double availableWidth, double scaleFactor) {
+      ImageData data, double availableWidth) {
     List<int> histogram = List.filled(65536, 0);
 
     for (var value in data.image!) {
@@ -209,7 +228,7 @@ class BarChartPage extends ConsumerWidget {
     }
 
     int groupSize = 256;
-    double barWidth = (availableWidth / groupSize) * scaleFactor;
+    double barWidth = availableWidth / groupSize;
 
     List<int> groupedHistogram = List.filled(groupSize, 0);
     for (int i = 0; i < 65536; i++) {
