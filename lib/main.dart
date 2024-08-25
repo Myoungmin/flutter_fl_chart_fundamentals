@@ -236,7 +236,7 @@ class BarChartPage extends ConsumerWidget {
     int groupSize = 256;
     double barWidth = availableWidth / groupSize;
 
-    List<int> groupedHistogram = List.filled(groupSize, 0);
+    List<int> groupedHistogram = List.filled(65536 ~/ groupSize, 0);
     for (int i = 0; i < 65536; i++) {
       if (i % groupSize == 0) {
         groupedHistogram[i ~/ groupSize] = histogram[i];
