@@ -100,112 +100,119 @@ class BarChartPage extends ConsumerWidget {
                 ref.read(scaleFactorProvider.notifier).state = scaleAfter;
               }
             },
-            child: Transform(
-              transform: Matrix4.identity()
-                ..translate(offset.dx, offset.dy)
-                ..scale(scaleFactor, scaleFactor),
-              alignment: FractionalOffset.topLeft,
-              child: SizedBox(
-                width: availableWidth,
-                height: constraints.maxHeight,
-                child: BarChart(
-                  BarChartData(
-                    barGroups: _generateBarGroups(imageData, availableWidth),
-                    titlesData: FlTitlesData(
-                      bottomTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                          showTitles: true,
-                          reservedSize: 22,
-                          interval: 2048,
-                          getTitlesWidget: (double value, TitleMeta meta) {
-                            const style = TextStyle(
-                              color: Color(0xff7589a2),
-                              fontWeight: FontWeight.bold,
-                              fontSize: 10,
-                            );
+            child: GestureDetector(
+              onDoubleTap: () {
+                ref.read(offsetProvider.notifier).state = Offset.zero;
+                ref.read(scaleFactorProvider.notifier).state = 1.0;
+              },
+              child: Transform(
+                transform: Matrix4.identity()
+                  ..translate(offset.dx, offset.dy)
+                  ..scale(scaleFactor, scaleFactor),
+                alignment: FractionalOffset.topLeft,
+                child: SizedBox(
+                  width: availableWidth,
+                  height: constraints.maxHeight,
+                  child: BarChart(
+                    BarChartData(
+                      barGroups: _generateBarGroups(imageData, availableWidth),
+                      titlesData: FlTitlesData(
+                        bottomTitles: AxisTitles(
+                          sideTitles: SideTitles(
+                            showTitles: true,
+                            reservedSize: 22,
+                            interval: 2048,
+                            getTitlesWidget: (double value, TitleMeta meta) {
+                              const style = TextStyle(
+                                color: Color(0xff7589a2),
+                                fontWeight: FontWeight.bold,
+                                fontSize: 10,
+                              );
 
-                            String text;
-                            int groupValue = value.toInt() * 256;
-                            if (groupValue % 2048 != 0) {
-                              text = '';
-                            } else if (groupValue >= 1000) {
-                              text =
-                                  '${(groupValue / 1000).toStringAsFixed(0)}K';
-                            } else {
-                              text = groupValue.toString();
-                            }
+                              String text;
+                              int groupValue = value.toInt() * 256;
+                              if (groupValue % 2048 != 0) {
+                                text = '';
+                              } else if (groupValue >= 1000) {
+                                text =
+                                    '${(groupValue / 1000).toStringAsFixed(0)}K';
+                              } else {
+                                text = groupValue.toString();
+                              }
 
-                            return SideTitleWidget(
-                              axisSide: meta.axisSide,
-                              space: 4,
-                              child: Text(text, style: style),
+                              return SideTitleWidget(
+                                axisSide: meta.axisSide,
+                                space: 4,
+                                child: Text(text, style: style),
+                              );
+                            },
+                          ),
+                        ),
+                        leftTitles: AxisTitles(
+                          sideTitles: SideTitles(
+                            reservedSize: 40,
+                            showTitles: true,
+                            interval: 1000,
+                            getTitlesWidget: (double value, TitleMeta meta) {
+                              const style = TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 10,
+                              );
+
+                              String text;
+                              if (value.toInt() % 1000 != 0) {
+                                text = '';
+                              } else if (value >= 1000000) {
+                                text =
+                                    '${(value / 1000000).toStringAsFixed(0)}M';
+                              } else if (value >= 1000) {
+                                text = '${(value / 1000).toStringAsFixed(0)}K';
+                              } else {
+                                text = value.toInt().toString();
+                              }
+
+                              return SideTitleWidget(
+                                axisSide: meta.axisSide,
+                                space: 4,
+                                child: Text(text, style: style),
+                              );
+                            },
+                          ),
+                        ),
+                        topTitles: AxisTitles(
+                          sideTitles: SideTitles(
+                              showTitles: true,
+                              reservedSize: 88,
+                              getTitlesWidget: (double value, TitleMeta meta) {
+                                return const SizedBox.shrink();
+                              }),
+                        ),
+                        rightTitles: AxisTitles(
+                          sideTitles: SideTitles(
+                              showTitles: true,
+                              getTitlesWidget: (double value, TitleMeta meta) {
+                                return const SizedBox.shrink();
+                              }),
+                        ),
+                      ),
+                      borderData: FlBorderData(
+                        show: true,
+                        border: const Border(
+                          top: BorderSide(color: Colors.transparent),
+                        ),
+                      ),
+                      gridData: const FlGridData(show: true),
+                      barTouchData: BarTouchData(
+                        enabled: true,
+                        touchTooltipData: BarTouchTooltipData(
+                          getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                            return BarTooltipItem(
+                              'Count: ${rod.toY.toStringAsFixed(0)}\n Pixel Value: ${group.x * 256}\n',
+                              const TextStyle(color: Colors.red),
                             );
                           },
                         ),
-                      ),
-                      leftTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                          reservedSize: 40,
-                          showTitles: true,
-                          interval: 1000,
-                          getTitlesWidget: (double value, TitleMeta meta) {
-                            const style = TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 10,
-                            );
-
-                            String text;
-                            if (value.toInt() % 1000 != 0) {
-                              text = '';
-                            } else if (value >= 1000000) {
-                              text = '${(value / 1000000).toStringAsFixed(0)}M';
-                            } else if (value >= 1000) {
-                              text = '${(value / 1000).toStringAsFixed(0)}K';
-                            } else {
-                              text = value.toInt().toString();
-                            }
-
-                            return SideTitleWidget(
-                              axisSide: meta.axisSide,
-                              space: 4,
-                              child: Text(text, style: style),
-                            );
-                          },
-                        ),
-                      ),
-                      topTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                            showTitles: true,
-                            reservedSize: 88,
-                            getTitlesWidget: (double value, TitleMeta meta) {
-                              return const SizedBox.shrink();
-                            }),
-                      ),
-                      rightTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                            showTitles: true,
-                            getTitlesWidget: (double value, TitleMeta meta) {
-                              return const SizedBox.shrink();
-                            }),
-                      ),
-                    ),
-                    borderData: FlBorderData(
-                      show: true,
-                      border: const Border(
-                        top: BorderSide(color: Colors.transparent),
-                      ),
-                    ),
-                    gridData: const FlGridData(show: true),
-                    barTouchData: BarTouchData(
-                      enabled: true,
-                      touchTooltipData: BarTouchTooltipData(
-                        getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                          return BarTooltipItem(
-                            'Count: ${rod.toY.toStringAsFixed(0)}\n Pixel Value: ${group.x * 256}\n',
-                            const TextStyle(color: Colors.red),
-                          );
-                        },
                       ),
                     ),
                   ),
