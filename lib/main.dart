@@ -84,21 +84,20 @@ class BarChartPage extends ConsumerWidget {
             onPointerSignal: (event) {
               if (event is PointerScrollEvent) {
                 double scaleChange = event.scrollDelta.dy > 0 ? 0.9 : 1.1;
-                double currentScale = ref.read(scaleFactorProvider);
-
-                double scale = currentScale * scaleChange;
+                double scaleBefore = ref.read(scaleFactorProvider);
+                double scaleAfter = scaleBefore * scaleChange;
 
                 Offset focalPoint = event.localPosition;
-
                 Offset offsetBefore = ref.read(offsetProvider);
 
                 Offset focalPointInWidget =
-                    (focalPoint - offsetBefore) / currentScale;
+                    (focalPoint - offsetBefore) / scaleBefore;
 
-                ref.read(offsetProvider.notifier).state =
-                    focalPoint - focalPointInWidget * scale;
+                Offset offsetAfter =
+                    focalPoint - (focalPointInWidget * scaleAfter);
 
-                ref.read(scaleFactorProvider.notifier).state = scale;
+                ref.read(offsetProvider.notifier).state = offsetAfter;
+                ref.read(scaleFactorProvider.notifier).state = scaleAfter;
               }
             },
             child: Transform(
