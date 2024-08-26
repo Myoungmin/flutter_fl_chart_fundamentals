@@ -154,9 +154,10 @@ class BarChartPage extends ConsumerWidget {
 
   List<BarChartGroupData> _generateBarGroups(WidgetRef ref, ImageData data,
       double availableWidth, List<int> histogram) {
-    int groupCount = ref.read(barChartPageViewModelProvider).groupCount;
-    int start = ref.read(barChartPageViewModelProvider).start;
-    int end = ref.read(barChartPageViewModelProvider).end;
+    BarChartPageViewModel viewModel = ref.watch(barChartPageViewModelProvider);
+    int groupCount = viewModel.groupCount;
+    int start = viewModel.start;
+    int end = viewModel.end;
     int groupSize = ref.read(barChartPageViewModelProvider.notifier).groupSize;
 
     double barWidth = availableWidth / groupSize;
