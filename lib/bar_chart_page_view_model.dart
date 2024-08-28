@@ -22,7 +22,7 @@ class BarChartPageViewModelNotifier extends Notifier<BarChartPageViewModel> {
 
   @override
   BarChartPageViewModel build() {
-    return BarChartPageViewModel();
+    return BarChartPageViewModel(end: 2559);
   }
 
   void setRange(int start, int end) {

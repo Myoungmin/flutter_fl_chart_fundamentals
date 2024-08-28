@@ -14,6 +14,7 @@ class BarChartPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     ImageData imageData = ref.watch(imageDataProvider);
+    int groupSize = ref.read(barChartPageViewModelProvider.notifier).groupSize;
 
     List<int> histogram = List.filled(65536, 0);
 
@@ -24,7 +25,7 @@ class BarChartPage extends ConsumerWidget {
     return Center(
       child: LayoutBuilder(
         builder: (context, constraints) {
-          double availableWidth = constraints.maxWidth;
+          double availableWidth = constraints.maxWidth - 100;
           return Listener(
             onPointerSignal: (event) {
               if (event is PointerScrollEvent) {
@@ -59,8 +60,8 @@ class BarChartPage extends ConsumerWidget {
                             );
 
                             String text;
-                            int groupValue = value.toInt() * 256;
-                            if (groupValue % 2048 != 0) {
+                            int groupValue = value.toInt() * groupSize;
+                            if (groupValue % 100 != 0) {
                               text = '';
                             } else if (groupValue >= 1000) {
                               text =
@@ -90,7 +91,7 @@ class BarChartPage extends ConsumerWidget {
                             );
 
                             String text;
-                            if (value.toInt() % 1000 != 0) {
+                            if (value.toInt() % 100 != 0) {
                               text = '';
                             } else if (value >= 1000000) {
                               text = '${(value / 1000000).toStringAsFixed(0)}M';
@@ -136,7 +137,7 @@ class BarChartPage extends ConsumerWidget {
                       touchTooltipData: BarTouchTooltipData(
                         getTooltipItem: (group, groupIndex, rod, rodIndex) {
                           return BarTooltipItem(
-                            'Count: ${rod.toY.toStringAsFixed(0)}\n Pixel Value: ${group.x * 256}\n',
+                            'Count: ${rod.toY.toStringAsFixed(0)}\n Pixel Value: ${group.x * groupSize}\n',
                             const TextStyle(color: Colors.red),
                           );
                         },
@@ -160,13 +161,14 @@ class BarChartPage extends ConsumerWidget {
     int end = viewModel.end;
     int groupSize = ref.read(barChartPageViewModelProvider.notifier).groupSize;
 
-    double barWidth = availableWidth / groupSize;
+    double spaceBetweenBars = 0.1;
+    double totalSpace = (groupCount - 1) * spaceBetweenBars;
+    double barWidth = (availableWidth - totalSpace) / groupCount;
 
     List<int> groupedHistogram = List.filled(groupCount, 0);
     for (int i = start; i < end; i++) {
-      if (i % groupSize == 0) {
-        groupedHistogram[i ~/ groupSize] = histogram[i];
-      }
+      int groupIndex = (i - start) ~/ groupSize;
+      groupedHistogram[groupIndex] += histogram[i];
     }
 
     List<BarChartGroupData> barGroups = [];
@@ -174,6 +176,7 @@ class BarChartPage extends ConsumerWidget {
       barGroups.add(
         BarChartGroupData(
           x: i,
+          barsSpace: spaceBetweenBars,
           barRods: [
             BarChartRodData(
               toY: groupedHistogram[i].toDouble(),
