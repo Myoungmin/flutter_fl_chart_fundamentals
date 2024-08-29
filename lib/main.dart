@@ -15,6 +15,7 @@ class BarChartPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     ImageData imageData = ref.watch(imageDataProvider);
     int groupSize = ref.read(barChartPageViewModelProvider.notifier).groupSize;
+    int interval = groupSize * 8;
 
     List<int> histogram = List.filled(65536, 0);
 
@@ -51,7 +52,7 @@ class BarChartPage extends ConsumerWidget {
                         sideTitles: SideTitles(
                           showTitles: true,
                           reservedSize: 22,
-                          interval: 2048,
+                          interval: interval.toDouble(),
                           getTitlesWidget: (double value, TitleMeta meta) {
                             const style = TextStyle(
                               color: Color(0xff7589a2),
@@ -59,15 +60,22 @@ class BarChartPage extends ConsumerWidget {
                               fontSize: 10,
                             );
 
+                            double pixelValue = value * groupSize;
+
+                            // interval에 맞춰 실제로 라벨이 표시될지 여부 확인
+                            if (pixelValue % meta.appliedInterval != 0) {
+                              return Container();
+                            }
+
                             String text;
-                            int groupValue = value.toInt() * groupSize;
-                            if (groupValue % 100 != 0) {
-                              text = '';
-                            } else if (groupValue >= 1000) {
+                            if (pixelValue >= 1000000) {
                               text =
-                                  '${(groupValue / 1000).toStringAsFixed(0)}K';
+                                  '${(pixelValue / 1000000).toStringAsFixed(1)}M';
+                            } else if (pixelValue >= 1000) {
+                              text =
+                                  '${(pixelValue / 1000).toStringAsFixed(1)}K';
                             } else {
-                              text = groupValue.toString();
+                              text = pixelValue.toStringAsFixed(0);
                             }
 
                             return SideTitleWidget(
@@ -82,7 +90,7 @@ class BarChartPage extends ConsumerWidget {
                         sideTitles: SideTitles(
                           reservedSize: 40,
                           showTitles: true,
-                          interval: 1000,
+                          interval: 50,
                           getTitlesWidget: (double value, TitleMeta meta) {
                             const style = TextStyle(
                               color: Colors.black,
@@ -91,14 +99,10 @@ class BarChartPage extends ConsumerWidget {
                             );
 
                             String text;
-                            if (value.toInt() % 100 != 0) {
-                              text = '';
-                            } else if (value >= 1000000) {
-                              text = '${(value / 1000000).toStringAsFixed(0)}M';
-                            } else if (value >= 1000) {
-                              text = '${(value / 1000).toStringAsFixed(0)}K';
+                            if (value >= 1000000) {
+                              text = '${(value / 1000000).toStringAsFixed(3)}M';
                             } else {
-                              text = value.toInt().toString();
+                              text = value.toStringAsFixed(0);
                             }
 
                             return SideTitleWidget(
@@ -136,8 +140,9 @@ class BarChartPage extends ConsumerWidget {
                       enabled: true,
                       touchTooltipData: BarTouchTooltipData(
                         getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                          int pixelValue = group.x * groupSize;
                           return BarTooltipItem(
-                            'Count: ${rod.toY.toStringAsFixed(0)}\n Pixel Value: ${group.x * groupSize}\n',
+                            'Count: ${rod.toY.toStringAsFixed(0)}\n Pixel Value: $pixelValue\n',
                             const TextStyle(color: Colors.red),
                           );
                         },
@@ -167,8 +172,10 @@ class BarChartPage extends ConsumerWidget {
 
     List<int> groupedHistogram = List.filled(groupCount, 0);
     for (int i = start; i < end; i++) {
-      int groupIndex = (i - start) ~/ groupSize;
-      groupedHistogram[groupIndex] += histogram[i];
+      if ((i - start) % groupSize == 0) {
+        int groupIndex = (i - start) ~/ groupSize;
+        groupedHistogram[groupIndex] = histogram[i];
+      }
     }
 
     List<BarChartGroupData> barGroups = [];
