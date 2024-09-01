@@ -16,8 +16,8 @@ class BarChartPage extends ConsumerWidget {
     ImageData imageData = ref.watch(imageDataProvider);
     BarChartPageViewModel viewModel = ref.watch(barChartPageViewModelProvider);
     int start = viewModel.start;
-    int scale = viewModel.scale;
-    int interval = scale * 8;
+    double scale = viewModel.scale;
+    int interval = scale.toInt() * 8;
     List<int> histogram = List.filled(65536, 0);
 
     for (var value in imageData.image!) {
@@ -32,7 +32,16 @@ class BarChartPage extends ConsumerWidget {
             onPointerSignal: (event) {
               if (event is PointerScrollEvent) {
                 if (event.scrollDelta.dy > 0) {
-                } else {}
+                  double newScale = scale * 0.9;
+                  ref
+                      .watch(barChartPageViewModelProvider.notifier)
+                      .setScale(newScale);
+                } else {
+                  double newScale = scale * 1.1;
+                  ref
+                      .watch(barChartPageViewModelProvider.notifier)
+                      .setScale(newScale);
+                }
               }
             },
             child: GestureDetector(
@@ -61,7 +70,7 @@ class BarChartPage extends ConsumerWidget {
                               fontSize: 10,
                             );
 
-                            double pixelValue = start + value * scale;
+                            double pixelValue = start + value * scale.toInt();
 
                             // interval에 맞춰 실제로 라벨이 표시될지 여부 확인
                             if ((pixelValue - start) % meta.appliedInterval !=
@@ -142,7 +151,7 @@ class BarChartPage extends ConsumerWidget {
                       enabled: true,
                       touchTooltipData: BarTouchTooltipData(
                         getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                          int pixelValue = start + group.x * scale;
+                          int pixelValue = start + group.x * scale.toInt();
                           return BarTooltipItem(
                             'Count: ${rod.toY.toStringAsFixed(0)}\n Pixel Value: $pixelValue\n',
                             const TextStyle(color: Colors.red),
@@ -164,7 +173,7 @@ class BarChartPage extends ConsumerWidget {
       double availableWidth, List<int> histogram) {
     BarChartPageViewModel viewModel = ref.watch(barChartPageViewModelProvider);
     int groupCount = viewModel.groupCount;
-    int scale = viewModel.scale;
+    int scale = viewModel.scale.toInt();
     int start = viewModel.start;
     int end = start + scale * groupCount;
 
