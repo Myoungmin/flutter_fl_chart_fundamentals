@@ -7,7 +7,7 @@ part 'bar_chart_page_view_model.freezed.dart';
 class BarChartPageViewModel with _$BarChartPageViewModel {
   factory BarChartPageViewModel({
     @Default(0) int start,
-    @Default(65535) int end,
+    @Default(256) int scale,
     @Default(256) int groupCount,
   }) = _BarChartPageViewModel;
 }
@@ -17,19 +17,21 @@ final barChartPageViewModelProvider =
         BarChartPageViewModelNotifier.new);
 
 class BarChartPageViewModelNotifier extends Notifier<BarChartPageViewModel> {
-  int get range => state.end - state.start + 1;
-  int get groupSize => range ~/ state.groupCount;
+  int get range => state.scale * state.groupCount;
 
   @override
   BarChartPageViewModel build() {
-    return BarChartPageViewModel(end: 2559);
+    return BarChartPageViewModel(start: 256, scale: 255);
   }
 
-  void setRange(int start, int end) {
-    start = start.clamp(0, 65535);
-    end = end.clamp(0, 65535);
-    if (start >= end) return;
+  void setScale(int scale) {
+    scale = scale.clamp(1, 256);
+    state = state.copyWith(scale: scale);
+  }
 
-    state = state.copyWith(start: start, end: end);
+  void setStart(int start) {
+    int max = 65536 - state.scale * state.groupCount;
+    start = start.clamp(0, max);
+    state = state.copyWith(start: start);
   }
 }

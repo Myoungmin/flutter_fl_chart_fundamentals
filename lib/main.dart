@@ -14,9 +14,10 @@ class BarChartPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     ImageData imageData = ref.watch(imageDataProvider);
-    int groupSize = ref.read(barChartPageViewModelProvider.notifier).groupSize;
-    int interval = groupSize * 8;
-
+    BarChartPageViewModel viewModel = ref.watch(barChartPageViewModelProvider);
+    int start = viewModel.start;
+    int scale = viewModel.scale;
+    int interval = scale * 8;
     List<int> histogram = List.filled(65536, 0);
 
     for (var value in imageData.image!) {
@@ -60,10 +61,11 @@ class BarChartPage extends ConsumerWidget {
                               fontSize: 10,
                             );
 
-                            double pixelValue = value * groupSize;
+                            double pixelValue = start + value * scale;
 
                             // interval에 맞춰 실제로 라벨이 표시될지 여부 확인
-                            if (pixelValue % meta.appliedInterval != 0) {
+                            if ((pixelValue - start) % meta.appliedInterval !=
+                                0) {
                               return Container();
                             }
 
@@ -140,7 +142,7 @@ class BarChartPage extends ConsumerWidget {
                       enabled: true,
                       touchTooltipData: BarTouchTooltipData(
                         getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                          int pixelValue = group.x * groupSize;
+                          int pixelValue = start + group.x * scale;
                           return BarTooltipItem(
                             'Count: ${rod.toY.toStringAsFixed(0)}\n Pixel Value: $pixelValue\n',
                             const TextStyle(color: Colors.red),
@@ -162,9 +164,9 @@ class BarChartPage extends ConsumerWidget {
       double availableWidth, List<int> histogram) {
     BarChartPageViewModel viewModel = ref.watch(barChartPageViewModelProvider);
     int groupCount = viewModel.groupCount;
+    int scale = viewModel.scale;
     int start = viewModel.start;
-    int end = viewModel.end;
-    int groupSize = ref.read(barChartPageViewModelProvider.notifier).groupSize;
+    int end = start + scale * groupCount;
 
     double spaceBetweenBars = 0.1;
     double totalSpace = (groupCount - 1) * spaceBetweenBars;
@@ -172,8 +174,8 @@ class BarChartPage extends ConsumerWidget {
 
     List<int> groupedHistogram = List.filled(groupCount, 0);
     for (int i = start; i < end; i++) {
-      if ((i - start) % groupSize == 0) {
-        int groupIndex = (i - start) ~/ groupSize;
+      if ((i - start) % scale == 0) {
+        int groupIndex = (i - start) ~/ scale;
         groupedHistogram[groupIndex] = histogram[i];
       }
     }

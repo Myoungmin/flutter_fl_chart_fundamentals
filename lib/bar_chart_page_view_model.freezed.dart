@@ -17,7 +17,7 @@ final _privateConstructorUsedError = UnsupportedError(
 /// @nodoc
 mixin _$BarChartPageViewModel {
   int get start => throw _privateConstructorUsedError;
-  int get end => throw _privateConstructorUsedError;
+  int get scale => throw _privateConstructorUsedError;
   int get groupCount => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
@@ -31,7 +31,7 @@ abstract class $BarChartPageViewModelCopyWith<$Res> {
           $Res Function(BarChartPageViewModel) then) =
       _$BarChartPageViewModelCopyWithImpl<$Res, BarChartPageViewModel>;
   @useResult
-  $Res call({int start, int end, int groupCount});
+  $Res call({int start, int scale, int groupCount});
 }
 
 /// @nodoc
@@ -49,7 +49,7 @@ class _$BarChartPageViewModelCopyWithImpl<$Res,
   @override
   $Res call({
     Object? start = null,
-    Object? end = null,
+    Object? scale = null,
     Object? groupCount = null,
   }) {
     return _then(_value.copyWith(
@@ -57,9 +57,9 @@ class _$BarChartPageViewModelCopyWithImpl<$Res,
           ? _value.start
           : start // ignore: cast_nullable_to_non_nullable
               as int,
-      end: null == end
-          ? _value.end
-          : end // ignore: cast_nullable_to_non_nullable
+      scale: null == scale
+          ? _value.scale
+          : scale // ignore: cast_nullable_to_non_nullable
               as int,
       groupCount: null == groupCount
           ? _value.groupCount
@@ -78,7 +78,7 @@ abstract class _$$BarChartPageViewModelImplCopyWith<$Res>
       __$$BarChartPageViewModelImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({int start, int end, int groupCount});
+  $Res call({int start, int scale, int groupCount});
 }
 
 /// @nodoc
@@ -94,7 +94,7 @@ class __$$BarChartPageViewModelImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? start = null,
-    Object? end = null,
+    Object? scale = null,
     Object? groupCount = null,
   }) {
     return _then(_$BarChartPageViewModelImpl(
@@ -102,9 +102,9 @@ class __$$BarChartPageViewModelImplCopyWithImpl<$Res>
           ? _value.start
           : start // ignore: cast_nullable_to_non_nullable
               as int,
-      end: null == end
-          ? _value.end
-          : end // ignore: cast_nullable_to_non_nullable
+      scale: null == scale
+          ? _value.scale
+          : scale // ignore: cast_nullable_to_non_nullable
               as int,
       groupCount: null == groupCount
           ? _value.groupCount
@@ -118,21 +118,21 @@ class __$$BarChartPageViewModelImplCopyWithImpl<$Res>
 
 class _$BarChartPageViewModelImpl implements _BarChartPageViewModel {
   _$BarChartPageViewModelImpl(
-      {this.start = 0, this.end = 65535, this.groupCount = 256});
+      {this.start = 0, this.scale = 256, this.groupCount = 256});
 
   @override
   @JsonKey()
   final int start;
   @override
   @JsonKey()
-  final int end;
+  final int scale;
   @override
   @JsonKey()
   final int groupCount;
 
   @override
   String toString() {
-    return 'BarChartPageViewModel(start: $start, end: $end, groupCount: $groupCount)';
+    return 'BarChartPageViewModel(start: $start, scale: $scale, groupCount: $groupCount)';
   }
 
   @override
@@ -141,13 +141,13 @@ class _$BarChartPageViewModelImpl implements _BarChartPageViewModel {
         (other.runtimeType == runtimeType &&
             other is _$BarChartPageViewModelImpl &&
             (identical(other.start, start) || other.start == start) &&
-            (identical(other.end, end) || other.end == end) &&
+            (identical(other.scale, scale) || other.scale == scale) &&
             (identical(other.groupCount, groupCount) ||
                 other.groupCount == groupCount));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, start, end, groupCount);
+  int get hashCode => Object.hash(runtimeType, start, scale, groupCount);
 
   @JsonKey(ignore: true)
   @override
@@ -160,13 +160,13 @@ class _$BarChartPageViewModelImpl implements _BarChartPageViewModel {
 abstract class _BarChartPageViewModel implements BarChartPageViewModel {
   factory _BarChartPageViewModel(
       {final int start,
-      final int end,
+      final int scale,
       final int groupCount}) = _$BarChartPageViewModelImpl;
 
   @override
   int get start;
   @override
-  int get end;
+  int get scale;
   @override
   int get groupCount;
   @override
