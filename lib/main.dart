@@ -19,6 +19,8 @@ class BarChartPage extends ConsumerWidget {
     double scale = viewModel.scale;
     int interval = scale.toInt() * 8;
     List<int> histogram = List.filled(65536, 0);
+    double dragStart = 0;
+    bool isDragging = false;
 
     for (var value in imageData.image!) {
       histogram[value]++;
@@ -44,121 +46,136 @@ class BarChartPage extends ConsumerWidget {
                 }
               }
             },
-            child: GestureDetector(
-              onDoubleTap: () {},
-              child: SizedBox(
-                width: availableWidth,
-                height: constraints.maxHeight,
-                child: BarChart(
-                  BarChartData(
-                    barGroups: _generateBarGroups(
-                      ref,
-                      imageData,
-                      availableWidth,
-                      histogram,
-                    ),
-                    titlesData: FlTitlesData(
-                      bottomTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                          showTitles: true,
-                          reservedSize: 22,
-                          interval: interval.toDouble(),
-                          getTitlesWidget: (double value, TitleMeta meta) {
-                            const style = TextStyle(
-                              color: Color(0xff7589a2),
-                              fontWeight: FontWeight.bold,
-                              fontSize: 10,
-                            );
+            child: SizedBox(
+              width: availableWidth,
+              height: constraints.maxHeight,
+              child: BarChart(
+                BarChartData(
+                  barGroups: _generateBarGroups(
+                    ref,
+                    imageData,
+                    availableWidth,
+                    histogram,
+                  ),
+                  titlesData: FlTitlesData(
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        reservedSize: 22,
+                        interval: interval.toDouble(),
+                        getTitlesWidget: (double value, TitleMeta meta) {
+                          const style = TextStyle(
+                            color: Color(0xff7589a2),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 10,
+                          );
 
-                            double pixelValue = start + value * scale.toInt();
+                          double pixelValue = start + value * scale.toInt();
 
-                            // interval에 맞춰 실제로 라벨이 표시될지 여부 확인
-                            if ((pixelValue - start) % meta.appliedInterval !=
-                                0) {
-                              return Container();
-                            }
+                          // interval에 맞춰 실제로 라벨이 표시될지 여부 확인
+                          if ((pixelValue - start) % meta.appliedInterval !=
+                              0) {
+                            return Container();
+                          }
 
-                            String text;
-                            if (pixelValue >= 1000000) {
-                              text =
-                                  '${(pixelValue / 1000000).toStringAsFixed(1)}M';
-                            } else if (pixelValue >= 1000) {
-                              text =
-                                  '${(pixelValue / 1000).toStringAsFixed(1)}K';
-                            } else {
-                              text = pixelValue.toStringAsFixed(0);
-                            }
+                          String text;
+                          if (pixelValue >= 1000000) {
+                            text =
+                                '${(pixelValue / 1000000).toStringAsFixed(1)}M';
+                          } else if (pixelValue >= 1000) {
+                            text = '${(pixelValue / 1000).toStringAsFixed(1)}K';
+                          } else {
+                            text = pixelValue.toStringAsFixed(0);
+                          }
 
-                            return SideTitleWidget(
-                              axisSide: meta.axisSide,
-                              space: 4,
-                              child: Text(text, style: style),
-                            );
-                          },
-                        ),
-                      ),
-                      leftTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                          reservedSize: 40,
-                          showTitles: true,
-                          interval: 50,
-                          getTitlesWidget: (double value, TitleMeta meta) {
-                            const style = TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 10,
-                            );
-
-                            String text;
-                            if (value >= 1000000) {
-                              text = '${(value / 1000000).toStringAsFixed(3)}M';
-                            } else {
-                              text = value.toStringAsFixed(0);
-                            }
-
-                            return SideTitleWidget(
-                              axisSide: meta.axisSide,
-                              space: 4,
-                              child: Text(text, style: style),
-                            );
-                          },
-                        ),
-                      ),
-                      topTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                            showTitles: true,
-                            reservedSize: 88,
-                            getTitlesWidget: (double value, TitleMeta meta) {
-                              return const SizedBox.shrink();
-                            }),
-                      ),
-                      rightTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                            showTitles: true,
-                            getTitlesWidget: (double value, TitleMeta meta) {
-                              return const SizedBox.shrink();
-                            }),
-                      ),
-                    ),
-                    borderData: FlBorderData(
-                      show: true,
-                      border: const Border(
-                        top: BorderSide(color: Colors.transparent),
-                      ),
-                    ),
-                    gridData: const FlGridData(show: true),
-                    barTouchData: BarTouchData(
-                      enabled: true,
-                      touchTooltipData: BarTouchTooltipData(
-                        getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                          int pixelValue = start + group.x * scale.toInt();
-                          return BarTooltipItem(
-                            'Count: ${rod.toY.toStringAsFixed(0)}\n Pixel Value: $pixelValue\n',
-                            const TextStyle(color: Colors.red),
+                          return SideTitleWidget(
+                            axisSide: meta.axisSide,
+                            space: 4,
+                            child: Text(text, style: style),
                           );
                         },
                       ),
                     ),
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        reservedSize: 40,
+                        showTitles: true,
+                        interval: 50,
+                        getTitlesWidget: (double value, TitleMeta meta) {
+                          const style = TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 10,
+                          );
+
+                          String text;
+                          if (value >= 1000000) {
+                            text = '${(value / 1000000).toStringAsFixed(3)}M';
+                          } else {
+                            text = value.toStringAsFixed(0);
+                          }
+
+                          return SideTitleWidget(
+                            axisSide: meta.axisSide,
+                            space: 4,
+                            child: Text(text, style: style),
+                          );
+                        },
+                      ),
+                    ),
+                    topTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                          showTitles: true,
+                          reservedSize: 88,
+                          getTitlesWidget: (double value, TitleMeta meta) {
+                            return const SizedBox.shrink();
+                          }),
+                    ),
+                    rightTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                          showTitles: true,
+                          getTitlesWidget: (double value, TitleMeta meta) {
+                            return const SizedBox.shrink();
+                          }),
+                    ),
+                  ),
+                  borderData: FlBorderData(
+                    show: true,
+                    border: const Border(
+                      top: BorderSide(color: Colors.transparent),
+                    ),
+                  ),
+                  gridData: const FlGridData(show: true),
+                  barTouchData: BarTouchData(
+                    enabled: true,
+                    touchTooltipData: BarTouchTooltipData(
+                      getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                        int pixelValue = start + group.x * scale.toInt();
+                        return BarTooltipItem(
+                          'Count: ${rod.toY.toStringAsFixed(0)}\n Pixel Value: $pixelValue\n',
+                          const TextStyle(color: Colors.red),
+                        );
+                      },
+                    ),
+                    touchCallback:
+                        (FlTouchEvent event, BarTouchResponse? response) {
+                      if (event is FlPanStartEvent) {
+                        dragStart = event.localPosition.dx;
+                        isDragging = true;
+                      } else if (event is FlPanUpdateEvent) {
+                        if (isDragging) {
+                          int oldStart =
+                              ref.read(barChartPageViewModelProvider).start;
+                          double newStart = oldStart -
+                              (event.localPosition.dx - dragStart) * scale;
+                          ref
+                              .read(barChartPageViewModelProvider.notifier)
+                              .setStart(newStart.toInt());
+                        }
+                      } else if (event is FlPanEndEvent) {
+                        isDragging = false;
+                      }
+                    },
                   ),
                 ),
               ),
