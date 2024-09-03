@@ -8,19 +8,25 @@ import 'package:flutter_fl_chart_fundamentals/bar_chart_page_view_model.dart';
 import 'package:flutter_fl_chart_fundamentals/image_data.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class BarChartPage extends ConsumerWidget {
+class BarChartPage extends ConsumerStatefulWidget {
   const BarChartPage({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ConsumerStatefulWidget> createState() => BarChartPageState();
+}
+
+class BarChartPageState extends ConsumerState<BarChartPage> {
+  double dragStart = 0;
+  int oldStart = 0;
+
+  @override
+  Widget build(BuildContext context) {
     ImageData imageData = ref.watch(imageDataProvider);
     BarChartPageViewModel viewModel = ref.watch(barChartPageViewModelProvider);
     int start = viewModel.start;
     double scale = viewModel.scale;
     int interval = scale.toInt() * 8;
     List<int> histogram = List.filled(65536, 0);
-    double dragStart = 0;
-    bool isDragging = false;
 
     for (var value in imageData.image!) {
       histogram[value]++;
@@ -34,12 +40,12 @@ class BarChartPage extends ConsumerWidget {
             onPointerSignal: (event) {
               if (event is PointerScrollEvent) {
                 if (event.scrollDelta.dy > 0) {
-                  double newScale = scale * 0.9;
+                  double newScale = scale * 1.1;
                   ref
                       .watch(barChartPageViewModelProvider.notifier)
                       .setScale(newScale);
                 } else {
-                  double newScale = scale * 1.1;
+                  double newScale = scale * 0.9;
                   ref
                       .watch(barChartPageViewModelProvider.notifier)
                       .setScale(newScale);
@@ -161,19 +167,14 @@ class BarChartPage extends ConsumerWidget {
                         (FlTouchEvent event, BarTouchResponse? response) {
                       if (event is FlPanStartEvent) {
                         dragStart = event.localPosition.dx;
-                        isDragging = true;
+                        oldStart =
+                            ref.read(barChartPageViewModelProvider).start;
                       } else if (event is FlPanUpdateEvent) {
-                        if (isDragging) {
-                          int oldStart =
-                              ref.read(barChartPageViewModelProvider).start;
-                          double newStart = oldStart -
-                              (event.localPosition.dx - dragStart) * scale;
-                          ref
-                              .read(barChartPageViewModelProvider.notifier)
-                              .setStart(newStart.toInt());
-                        }
-                      } else if (event is FlPanEndEvent) {
-                        isDragging = false;
+                        double newStart = oldStart -
+                            (event.localPosition.dx - dragStart) * scale;
+                        ref
+                            .read(barChartPageViewModelProvider.notifier)
+                            .setStart(newStart.toInt());
                       }
                     },
                   ),
