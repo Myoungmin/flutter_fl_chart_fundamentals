@@ -26,7 +26,11 @@ class BarChartPageViewModelNotifier extends Notifier<BarChartPageViewModel> {
 
   void setScale(double scale) {
     scale = scale.clamp(1, 256);
-    state = state.copyWith(scale: scale);
+
+    int startMax = 65536 - scale.toInt() * state.groupCount;
+    int adjustedStart = state.start.clamp(0, startMax);
+
+    state = state.copyWith(start: adjustedStart, scale: scale);
   }
 
   void setStart(int start) {
