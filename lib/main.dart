@@ -24,7 +24,7 @@ class BarChartPageState extends ConsumerState<BarChartPage> {
     ImageData imageData = ref.watch(imageDataProvider);
     BarChartPageViewModel viewModel = ref.watch(barChartPageViewModelProvider);
     int start = viewModel.start;
-    int scale = viewModel.scale;
+    double scale = viewModel.scale;
     int interval = scale.toInt() * 8;
     List<int> histogram = List.filled(65536, 0);
 
@@ -43,12 +43,12 @@ class BarChartPageState extends ConsumerState<BarChartPage> {
                   double newScale = scale * 1.1;
                   ref
                       .watch(barChartPageViewModelProvider.notifier)
-                      .setScale(newScale.toInt());
+                      .setScale(newScale);
                 } else {
                   double newScale = scale * 0.9;
                   ref
                       .watch(barChartPageViewModelProvider.notifier)
-                      .setScale(newScale.toInt());
+                      .setScale(newScale);
                 }
               }
             },
