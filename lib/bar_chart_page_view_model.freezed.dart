@@ -17,7 +17,7 @@ final _privateConstructorUsedError = UnsupportedError(
 /// @nodoc
 mixin _$BarChartPageViewModel {
   int get start => throw _privateConstructorUsedError;
-  double get scale => throw _privateConstructorUsedError;
+  int get scale => throw _privateConstructorUsedError;
   int get groupCount => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
@@ -31,7 +31,7 @@ abstract class $BarChartPageViewModelCopyWith<$Res> {
           $Res Function(BarChartPageViewModel) then) =
       _$BarChartPageViewModelCopyWithImpl<$Res, BarChartPageViewModel>;
   @useResult
-  $Res call({int start, double scale, int groupCount});
+  $Res call({int start, int scale, int groupCount});
 }
 
 /// @nodoc
@@ -60,7 +60,7 @@ class _$BarChartPageViewModelCopyWithImpl<$Res,
       scale: null == scale
           ? _value.scale
           : scale // ignore: cast_nullable_to_non_nullable
-              as double,
+              as int,
       groupCount: null == groupCount
           ? _value.groupCount
           : groupCount // ignore: cast_nullable_to_non_nullable
@@ -78,7 +78,7 @@ abstract class _$$BarChartPageViewModelImplCopyWith<$Res>
       __$$BarChartPageViewModelImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({int start, double scale, int groupCount});
+  $Res call({int start, int scale, int groupCount});
 }
 
 /// @nodoc
@@ -105,7 +105,7 @@ class __$$BarChartPageViewModelImplCopyWithImpl<$Res>
       scale: null == scale
           ? _value.scale
           : scale // ignore: cast_nullable_to_non_nullable
-              as double,
+              as int,
       groupCount: null == groupCount
           ? _value.groupCount
           : groupCount // ignore: cast_nullable_to_non_nullable
@@ -125,7 +125,7 @@ class _$BarChartPageViewModelImpl implements _BarChartPageViewModel {
   final int start;
   @override
   @JsonKey()
-  final double scale;
+  final int scale;
   @override
   @JsonKey()
   final int groupCount;
@@ -160,13 +160,13 @@ class _$BarChartPageViewModelImpl implements _BarChartPageViewModel {
 abstract class _BarChartPageViewModel implements BarChartPageViewModel {
   factory _BarChartPageViewModel(
       {final int start,
-      final double scale,
+      final int scale,
       final int groupCount}) = _$BarChartPageViewModelImpl;
 
   @override
   int get start;
   @override
-  double get scale;
+  int get scale;
   @override
   int get groupCount;
   @override

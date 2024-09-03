@@ -7,7 +7,7 @@ part 'bar_chart_page_view_model.freezed.dart';
 class BarChartPageViewModel with _$BarChartPageViewModel {
   factory BarChartPageViewModel({
     @Default(0) int start,
-    @Default(256) double scale,
+    @Default(256) int scale,
     @Default(256) int groupCount,
   }) = _BarChartPageViewModel;
 }
@@ -24,7 +24,7 @@ class BarChartPageViewModelNotifier extends Notifier<BarChartPageViewModel> {
     return BarChartPageViewModel();
   }
 
-  void setScale(double scale) {
+  void setScale(int scale) {
     scale = scale.clamp(1, 256);
     state = state.copyWith(scale: scale);
   }
