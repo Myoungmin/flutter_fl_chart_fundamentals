@@ -39,17 +39,35 @@ class BarChartPageState extends ConsumerState<BarChartPage> {
           return Listener(
             onPointerSignal: (event) {
               if (event is PointerScrollEvent) {
+                // 마우스 포인터 위치
+                final localPosition = event.localPosition.dx;
+                // 차트에서의 상대 위치
+                final relativePosition = localPosition / availableWidth;
+                final currentStart =
+                    ref.read(barChartPageViewModelProvider).start;
+
+                double newScale = scale;
                 if (event.scrollDelta.dy > 0) {
-                  double newScale = scale * 1.1;
-                  ref
-                      .watch(barChartPageViewModelProvider.notifier)
-                      .setScale(newScale);
+                  newScale = scale * 1.1;
                 } else {
-                  double newScale = scale * 0.9;
-                  ref
-                      .watch(barChartPageViewModelProvider.notifier)
-                      .setScale(newScale);
+                  newScale = scale * 0.9;
                 }
+
+                // 현재 마우스 포인터가 가리키는 값
+                int currentPointer = currentStart +
+                    (viewModel.groupCount * relativePosition * scale).toInt();
+
+                // 스케일 변경으로 마우스 포인터가 가리키는 값은 유지하기 위한 새로운 시작점
+                int newStart = currentPointer -
+                    (viewModel.groupCount * relativePosition * newScale)
+                        .toInt();
+
+                ref
+                    .read(barChartPageViewModelProvider.notifier)
+                    .setScale(newScale);
+                ref
+                    .read(barChartPageViewModelProvider.notifier)
+                    .setStart(newStart);
               }
             },
             child: SizedBox(
