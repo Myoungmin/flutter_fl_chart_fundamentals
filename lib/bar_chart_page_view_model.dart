@@ -9,6 +9,8 @@ class BarChartPageViewModel with _$BarChartPageViewModel {
     @Default(0) int start,
     @Default(256) double scale,
     @Default(256) int groupCount,
+    @Default(16384) int interestStart,
+    @Default(49152) int interestEnd,
   }) = _BarChartPageViewModel;
 }
 
@@ -37,5 +39,15 @@ class BarChartPageViewModelNotifier extends Notifier<BarChartPageViewModel> {
     int max = 65536 - state.scale.toInt() * state.groupCount;
     start = start.clamp(0, max);
     state = state.copyWith(start: start);
+  }
+
+  void setInterestStart(int interestStart) {
+    interestStart = interestStart.clamp(0, state.interestEnd - 1);
+    state = state.copyWith(interestStart: interestStart);
+  }
+
+  void setInterestEnd(int interestEnd) {
+    interestEnd = interestEnd.clamp(state.interestStart + 1, 65535);
+    state = state.copyWith(interestEnd: interestEnd);
   }
 }

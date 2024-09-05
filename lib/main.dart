@@ -225,8 +225,13 @@ class BarChartPageState extends ConsumerState<BarChartPage> {
       }
     }
 
+    int groupInterestStart = (viewModel.interestStart - start) ~/ scale;
+    int groupInterestEnd = (viewModel.interestEnd - start) ~/ scale;
+
     List<BarChartGroupData> barGroups = [];
     for (int i = 0; i < groupedHistogram.length; i++) {
+      bool isHighlighted = (i >= groupInterestStart && i <= groupInterestEnd);
+
       barGroups.add(
         BarChartGroupData(
           x: i,
@@ -234,7 +239,7 @@ class BarChartPageState extends ConsumerState<BarChartPage> {
           barRods: [
             BarChartRodData(
               toY: groupedHistogram[i].toDouble(),
-              color: Colors.blue,
+              color: isHighlighted ? Colors.blue : Colors.blue.withOpacity(0.3),
               width: barWidth,
             ),
           ],
