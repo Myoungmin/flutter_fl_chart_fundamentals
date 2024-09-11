@@ -165,6 +165,7 @@ class BarChartPageState extends ConsumerState<BarChartPage> {
                         rightTitles: AxisTitles(
                           sideTitles: SideTitles(
                               showTitles: true,
+                              reservedSize: 10,
                               getTitlesWidget: (double value, TitleMeta meta) {
                                 return const SizedBox.shrink();
                               }),
@@ -246,23 +247,27 @@ class BarChartPageState extends ConsumerState<BarChartPage> {
                   ),
                 ),
               ),
-              Expanded(
-                child: RangeSlider(
-                  min: viewModel.start.toDouble(),
-                  max: viewModel.start + scale * viewModel.groupCount,
-                  divisions: viewModel.groupCount,
-                  values: RangeValues(viewModel.interestStart.toDouble(),
-                      viewModel.interestEnd.toDouble()),
-                  onChanged: (value) {
-                    BarChartPageViewModelNotifier
-                        barChartPageViewModelNotifier =
-                        ref.read(barChartPageViewModelProvider.notifier);
+              Padding(
+                padding: const EdgeInsets.only(left: 30),
+                child: SizedBox(
+                  width: availableWidth,
+                  child: RangeSlider(
+                    min: viewModel.start.toDouble(),
+                    max: viewModel.start + scale * viewModel.groupCount,
+                    divisions: viewModel.groupCount,
+                    values: RangeValues(viewModel.interestStart.toDouble(),
+                        viewModel.interestEnd.toDouble()),
+                    onChanged: (value) {
+                      BarChartPageViewModelNotifier
+                          barChartPageViewModelNotifier =
+                          ref.read(barChartPageViewModelProvider.notifier);
 
-                    barChartPageViewModelNotifier
-                        .setInterestStart(value.start.toInt());
-                    barChartPageViewModelNotifier
-                        .setInterestEnd(value.end.toInt());
-                  },
+                      barChartPageViewModelNotifier
+                          .setInterestStart(value.start.toInt());
+                      barChartPageViewModelNotifier
+                          .setInterestEnd(value.end.toInt());
+                    },
+                  ),
                 ),
               )
             ],
