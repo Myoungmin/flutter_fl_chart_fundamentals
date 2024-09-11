@@ -255,17 +255,34 @@ class BarChartPageState extends ConsumerState<BarChartPage> {
                     min: viewModel.start.toDouble(),
                     max: viewModel.start + scale * viewModel.groupCount,
                     divisions: viewModel.groupCount,
-                    values: RangeValues(viewModel.interestStart.toDouble(),
-                        viewModel.interestEnd.toDouble()),
+                    values: RangeValues(
+                      viewModel.interestStart.toDouble().clamp(
+                          viewModel.start.toDouble(),
+                          (viewModel.start + scale * viewModel.groupCount)
+                              .toDouble()),
+                      viewModel.interestEnd.toDouble().clamp(
+                          viewModel.start.toDouble(),
+                          (viewModel.start + scale * viewModel.groupCount)
+                              .toDouble()),
+                    ),
                     onChanged: (value) {
                       BarChartPageViewModelNotifier
                           barChartPageViewModelNotifier =
                           ref.read(barChartPageViewModelProvider.notifier);
 
+                      double adjustedStart = value.start.clamp(
+                          viewModel.start.toDouble(),
+                          (viewModel.start + scale * viewModel.groupCount)
+                              .toDouble());
+                      double adjustedEnd = value.end.clamp(
+                          viewModel.start.toDouble(),
+                          (viewModel.start + scale * viewModel.groupCount)
+                              .toDouble());
+
                       barChartPageViewModelNotifier
-                          .setInterestStart(value.start.toInt());
+                          .setInterestStart(adjustedStart.toInt());
                       barChartPageViewModelNotifier
-                          .setInterestEnd(value.end.toInt());
+                          .setInterestEnd(adjustedEnd.toInt());
                     },
                   ),
                 ),
