@@ -18,8 +18,6 @@ class BarChartPage extends ConsumerStatefulWidget {
 class BarChartPageState extends ConsumerState<BarChartPage> {
   double dragStart = 0;
   int oldStart = 0;
-  bool draggingInterestStart = false;
-  bool draggingInterestEnd = false;
 
   @override
   Widget build(BuildContext context) {
@@ -192,53 +190,16 @@ class BarChartPageState extends ConsumerState<BarChartPage> {
                         touchCallback:
                             (FlTouchEvent event, BarTouchResponse? response) {
                           if (response != null && response.spot != null) {
-                            int selectedX = response.spot!.touchedBarGroup.x;
-                            int actualPixelValue =
-                                start + selectedX * scale.toInt();
-                            int actualPixelRangeStart =
-                                start + (selectedX - 1) * scale.toInt();
-                            int actualPixelRangeEnd =
-                                start + (selectedX + 1) * scale.toInt();
-
                             if (event is FlPanStartEvent) {
                               dragStart = event.localPosition.dx;
                               oldStart =
                                   ref.read(barChartPageViewModelProvider).start;
-
-                              if (actualPixelRangeStart <=
-                                      viewModel.interestStart &&
-                                  viewModel.interestStart <=
-                                      actualPixelRangeEnd) {
-                                draggingInterestStart = true;
-                              } else if (actualPixelRangeStart <=
-                                      viewModel.interestEnd &&
-                                  viewModel.interestEnd <=
-                                      actualPixelRangeEnd) {
-                                draggingInterestEnd = true;
-                              }
                             } else if (event is FlPanUpdateEvent) {
-                              if (draggingInterestStart) {
-                                ref
-                                    .read(
-                                        barChartPageViewModelProvider.notifier)
-                                    .setInterestStart(actualPixelValue);
-                              } else if (draggingInterestEnd) {
-                                ref
-                                    .read(
-                                        barChartPageViewModelProvider.notifier)
-                                    .setInterestEnd(actualPixelValue);
-                              } else {
-                                double newStart = oldStart -
-                                    (event.localPosition.dx - dragStart) *
-                                        scale;
-                                ref
-                                    .read(
-                                        barChartPageViewModelProvider.notifier)
-                                    .setStart(newStart.toInt());
-                              }
-                            } else {
-                              draggingInterestStart = false;
-                              draggingInterestEnd = false;
+                              double newStart = oldStart -
+                                  (event.localPosition.dx - dragStart) * scale;
+                              ref
+                                  .read(barChartPageViewModelProvider.notifier)
+                                  .setStart(newStart.toInt());
                             }
                           }
                         },
