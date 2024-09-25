@@ -18,6 +18,7 @@ class BarChartPage extends ConsumerStatefulWidget {
 class BarChartPageState extends ConsumerState<BarChartPage> {
   double dragStart = 0;
   int oldStart = 0;
+  double initialScale = 1.0;
 
   @override
   Widget build(BuildContext context) {
@@ -73,136 +74,196 @@ class BarChartPageState extends ConsumerState<BarChartPage> {
                         .setStart(newStart);
                   }
                 },
-                child: SizedBox(
-                  width: availableWidth,
-                  height: constraints.maxHeight - 50,
-                  child: BarChart(
-                    BarChartData(
-                      barGroups: _generateBarGroups(
-                        ref,
-                        imageData,
-                        availableWidth,
-                        histogram,
-                      ),
-                      titlesData: FlTitlesData(
-                        bottomTitles: AxisTitles(
-                          sideTitles: SideTitles(
-                            showTitles: true,
-                            reservedSize: 22,
-                            interval: interval.toDouble(),
-                            getTitlesWidget: (double value, TitleMeta meta) {
-                              const style = TextStyle(
-                                color: Color(0xff7589a2),
-                                fontWeight: FontWeight.bold,
-                                fontSize: 10,
-                              );
+                child: GestureDetector(
+                  //behavior: HitTestBehavior.translucent,
+                  onDoubleTap: () {
+                    ref
+                        .read(barChartPageViewModelProvider.notifier)
+                        .setScale(256);
+                    ref
+                        .read(barChartPageViewModelProvider.notifier)
+                        .setStart(0);
+                  },
+                  onScaleStart: (details) {
+                    initialScale = viewModel.scale;
+                    dragStart = details.focalPoint.dx;
+                    oldStart = ref.read(barChartPageViewModelProvider).start;
+                  },
+                  onScaleUpdate: (details) {
+                    // 두 손가락 이상인 경우 (스케일링)
+                    if (details.pointerCount > 1) {
+                      double newScale =
+                          (initialScale / details.scale).clamp(0.1, 1000.0);
 
-                              double pixelValue = start + value * scale.toInt();
+                      // 중심 좌표 계산
+                      final focalPoint = details.localFocalPoint.dx;
+                      final relativeFocalPoint = focalPoint / availableWidth;
+                      final currentStart =
+                          ref.read(barChartPageViewModelProvider).start;
 
-                              // interval에 맞춰 실제로 라벨이 표시될지 여부 확인
-                              if ((pixelValue - start) % meta.appliedInterval !=
-                                  0) {
-                                return Container();
-                              }
+                      int currentPointer = currentStart +
+                          (viewModel.groupCount *
+                                  relativeFocalPoint *
+                                  viewModel.scale)
+                              .toInt();
+                      int newStart = currentPointer -
+                          (viewModel.groupCount * relativeFocalPoint * newScale)
+                              .toInt();
 
-                              String text;
-                              if (pixelValue >= 1000000) {
-                                text =
-                                    '${(pixelValue / 1000000).toStringAsFixed(1)}M';
-                              } else if (pixelValue >= 1000) {
-                                text =
-                                    '${(pixelValue / 1000).toStringAsFixed(1)}K';
-                              } else {
-                                text = pixelValue.toStringAsFixed(0);
-                              }
+                      ref
+                          .read(barChartPageViewModelProvider.notifier)
+                          .setScale(newScale);
+                      ref
+                          .read(barChartPageViewModelProvider.notifier)
+                          .setStart(newStart);
+                    } else {
+                      // 한 손가락인 경우 (팬)
+                      double newStart = oldStart -
+                          (details.focalPoint.dx - dragStart) * viewModel.scale;
+                      ref
+                          .read(barChartPageViewModelProvider.notifier)
+                          .setStart(newStart.toInt());
+                    }
+                  },
+                  child: SizedBox(
+                    width: availableWidth,
+                    height: constraints.maxHeight - 50,
+                    child: BarChart(
+                      BarChartData(
+                        barGroups: _generateBarGroups(
+                          ref,
+                          imageData,
+                          availableWidth,
+                          histogram,
+                        ),
+                        titlesData: FlTitlesData(
+                          bottomTitles: AxisTitles(
+                            sideTitles: SideTitles(
+                              showTitles: true,
+                              reservedSize: 22,
+                              interval: interval.toDouble(),
+                              getTitlesWidget: (double value, TitleMeta meta) {
+                                const style = TextStyle(
+                                  color: Color(0xff7589a2),
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 10,
+                                );
 
-                              return SideTitleWidget(
-                                axisSide: meta.axisSide,
-                                space: 4,
-                                child: Text(text, style: style),
+                                double pixelValue =
+                                    start + value * scale.toInt();
+
+                                // interval에 맞춰 실제로 라벨이 표시될지 여부 확인
+                                if ((pixelValue - start) %
+                                        meta.appliedInterval !=
+                                    0) {
+                                  return Container();
+                                }
+
+                                String text;
+                                if (pixelValue >= 1000000) {
+                                  text =
+                                      '${(pixelValue / 1000000).toStringAsFixed(1)}M';
+                                } else if (pixelValue >= 1000) {
+                                  text =
+                                      '${(pixelValue / 1000).toStringAsFixed(1)}K';
+                                } else {
+                                  text = pixelValue.toStringAsFixed(0);
+                                }
+
+                                return SideTitleWidget(
+                                  axisSide: meta.axisSide,
+                                  space: 4,
+                                  child: Text(text, style: style),
+                                );
+                              },
+                            ),
+                          ),
+                          leftTitles: AxisTitles(
+                            sideTitles: SideTitles(
+                              reservedSize: 40,
+                              showTitles: true,
+                              interval: 50,
+                              getTitlesWidget: (double value, TitleMeta meta) {
+                                const style = TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 10,
+                                );
+
+                                String text;
+                                if (value >= 1000000) {
+                                  text =
+                                      '${(value / 1000000).toStringAsFixed(3)}M';
+                                } else {
+                                  text = value.toStringAsFixed(0);
+                                }
+
+                                return SideTitleWidget(
+                                  axisSide: meta.axisSide,
+                                  space: 4,
+                                  child: Text(text, style: style),
+                                );
+                              },
+                            ),
+                          ),
+                          topTitles: AxisTitles(
+                            sideTitles: SideTitles(
+                                showTitles: true,
+                                reservedSize: 88,
+                                getTitlesWidget:
+                                    (double value, TitleMeta meta) {
+                                  return const SizedBox.shrink();
+                                }),
+                          ),
+                          rightTitles: AxisTitles(
+                            sideTitles: SideTitles(
+                                showTitles: true,
+                                reservedSize: 10,
+                                getTitlesWidget:
+                                    (double value, TitleMeta meta) {
+                                  return const SizedBox.shrink();
+                                }),
+                          ),
+                        ),
+                        borderData: FlBorderData(
+                          show: true,
+                          border: const Border(
+                            top: BorderSide(color: Colors.transparent),
+                          ),
+                        ),
+                        gridData: const FlGridData(show: true),
+                        barTouchData: BarTouchData(
+                          enabled: true,
+                          handleBuiltInTouches: true,
+                          touchTooltipData: BarTouchTooltipData(
+                            getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                              int pixelValue = start + group.x * scale.toInt();
+                              return BarTooltipItem(
+                                'Count: ${rod.toY.toStringAsFixed(0)}\n Pixel Value: $pixelValue\n',
+                                const TextStyle(color: Colors.red),
                               );
                             },
                           ),
-                        ),
-                        leftTitles: AxisTitles(
-                          sideTitles: SideTitles(
-                            reservedSize: 40,
-                            showTitles: true,
-                            interval: 50,
-                            getTitlesWidget: (double value, TitleMeta meta) {
-                              const style = TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 10,
-                              );
-
-                              String text;
-                              if (value >= 1000000) {
-                                text =
-                                    '${(value / 1000000).toStringAsFixed(3)}M';
-                              } else {
-                                text = value.toStringAsFixed(0);
+                          touchCallback:
+                              (FlTouchEvent event, BarTouchResponse? response) {
+                            if (response != null && response.spot != null) {
+                              if (event is FlPanStartEvent) {
+                                dragStart = event.localPosition.dx;
+                                oldStart = ref
+                                    .read(barChartPageViewModelProvider)
+                                    .start;
+                              } else if (event is FlPanUpdateEvent) {
+                                double newStart = oldStart -
+                                    (event.localPosition.dx - dragStart) *
+                                        scale;
+                                ref
+                                    .read(
+                                        barChartPageViewModelProvider.notifier)
+                                    .setStart(newStart.toInt());
                               }
-
-                              return SideTitleWidget(
-                                axisSide: meta.axisSide,
-                                space: 4,
-                                child: Text(text, style: style),
-                              );
-                            },
-                          ),
-                        ),
-                        topTitles: AxisTitles(
-                          sideTitles: SideTitles(
-                              showTitles: true,
-                              reservedSize: 88,
-                              getTitlesWidget: (double value, TitleMeta meta) {
-                                return const SizedBox.shrink();
-                              }),
-                        ),
-                        rightTitles: AxisTitles(
-                          sideTitles: SideTitles(
-                              showTitles: true,
-                              reservedSize: 10,
-                              getTitlesWidget: (double value, TitleMeta meta) {
-                                return const SizedBox.shrink();
-                              }),
-                        ),
-                      ),
-                      borderData: FlBorderData(
-                        show: true,
-                        border: const Border(
-                          top: BorderSide(color: Colors.transparent),
-                        ),
-                      ),
-                      gridData: const FlGridData(show: true),
-                      barTouchData: BarTouchData(
-                        enabled: true,
-                        touchTooltipData: BarTouchTooltipData(
-                          getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                            int pixelValue = start + group.x * scale.toInt();
-                            return BarTooltipItem(
-                              'Count: ${rod.toY.toStringAsFixed(0)}\n Pixel Value: $pixelValue\n',
-                              const TextStyle(color: Colors.red),
-                            );
+                            }
                           },
                         ),
-                        touchCallback:
-                            (FlTouchEvent event, BarTouchResponse? response) {
-                          if (response != null && response.spot != null) {
-                            if (event is FlPanStartEvent) {
-                              dragStart = event.localPosition.dx;
-                              oldStart =
-                                  ref.read(barChartPageViewModelProvider).start;
-                            } else if (event is FlPanUpdateEvent) {
-                              double newStart = oldStart -
-                                  (event.localPosition.dx - dragStart) * scale;
-                              ref
-                                  .read(barChartPageViewModelProvider.notifier)
-                                  .setStart(newStart.toInt());
-                            }
-                          }
-                        },
                       ),
                     ),
                   ),
