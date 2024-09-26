@@ -8,6 +8,23 @@ import 'package:flutter_fl_chart_fundamentals/bar_chart_page_view_model.dart';
 import 'package:flutter_fl_chart_fundamentals/image_data.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+final histogramProvider = Provider<List<int>>((ref) {
+  final imageData = ref.watch(imageDataProvider);
+  if (imageData.image == null) {
+    return List<int>.filled(65536, 0);
+  }
+
+  return _calculateHistogram(imageData.image!);
+});
+
+List<int> _calculateHistogram(Uint16List image) {
+  List<int> histogram = List.filled(65536, 0);
+  for (var value in image) {
+    histogram[value]++;
+  }
+  return histogram;
+}
+
 class BarChartPage extends ConsumerStatefulWidget {
   const BarChartPage({Key? key}) : super(key: key);
 
@@ -27,11 +44,7 @@ class BarChartPageState extends ConsumerState<BarChartPage> {
     int start = viewModel.start;
     double scale = viewModel.scale;
     int interval = scale.toInt() * 8;
-    List<int> histogram = List.filled(65536, 0);
-
-    for (var value in imageData.image!) {
-      histogram[value]++;
-    }
+    List<int> histogram = ref.watch(histogramProvider);
 
     return Center(
       child: LayoutBuilder(
